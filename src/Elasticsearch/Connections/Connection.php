@@ -127,6 +127,10 @@ class Connection implements ConnectionInterface
         }
 
         $host = $hostDetails['host'].':'.$hostDetails['port'];
+        $host = $hostDetails['host'];
+        if (!$this->isStandardPort($hostDetails['scheme'], $hostDetails['port'])) {
+            $host .= ':'.$hostDetails['port'];
+        }
         $path = null;
         if (isset($hostDetails['path']) === true) {
             $path = $hostDetails['path'];
@@ -718,5 +722,17 @@ class Connection implements ConnectionInterface
 
         // <2.0 "i just blew up" nonstructured exception
         return new $errorClass($response['body']);
+    }
+
+    /**
+     * @param $scheme
+     * @param $port
+     *
+     * @return bool
+     */
+    private function isStandardPort($scheme, $port)
+    {
+        return ('https' === strtolower($scheme) && 443 === $port)
+           || ('http' === strtolower($scheme) && 80 === $port);
     }
 }
